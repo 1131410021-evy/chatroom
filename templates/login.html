@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+    <h2>Welcome Back</h2>
+    <input type="text" id="acc" placeholder="Account Number">
+    <input type="password" id="pw" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <p>Need an account? <a href="/register">Register</a></p>
+
+    <script>
+        function login() {
+            const acc = document.getElementById('acc').value;
+            const pass = document.getElementById('pw').value;
+            firebase.auth().signInWithEmailAndPassword(acc + "@pwa.com", pass)
+                .then(() => window.location.href = "/board")
+                .catch(err => alert(err.message));
+        }
+    </script>
+{% endblock %}

@@ -1,1 +1,60 @@
+{% extends "base.html" %}
+{% block content %}
+    <h3 id="welcome-user">Chat Room</h3>
+    
+    <div id="messages" style="height: 250px; overflow-y: auto; border: 1px solid #ddd; margin-bottom: 10px; padding: 10px; text-align: left; background: #fff; border-radius: 8px; font-size: 0.9rem;"></div>
+    
+    <input type="text" id="msg" placeholder="Type a message...">
+    <button onclick="send()">Send Message</button>
+    
+    <p style="margin-top: 15px;">
+        <a href="#" onclick="logout()">Logout</a>
+    </p>
 
+    <script>
+        // 1. Connect to your Realtime Database
+        const db = firebase.database().ref('chats');
+        
+        // 2. Listen for new messages (This runs automatically when someone chats)
+        db.limitToLast(15).on('child_added', (snapshot) => {
+            const data = snapshot.val();
+            const msgDiv = document.getElementById('messages');
+            
+            // Create the message look
+            msgDiv.innerHTML += `<div style="margin-bottom: 8px;">
+                <span style="color: #b21f1f; font-weight: bold;">${data.user}:</span> ${data.text}
+            </div>`;
+            
+            // Auto-scroll to the bottom
+            msgDiv.scrollTop = msgDiv.scrollHeight;
+        });
+
+        // 3. Function to send your message
+        function send() {
+            const text = document.getElementById('msg').value;
+            const currentUser = firebase.auth().currentUser;
+
+            if (text && currentUser) {
+                // Get the ID from the email (e.g., "1131410021" from "1131410021@pwa.com")
+                const userId = currentUser.email.split('@')[0];
+                
+                db.push({
+                    user: userId,
+                    text: text,
+                    timestamp: Date.now()
+                });
+                
+                document.getElementById('msg').value = ''; // Clear input
+            } else if (!currentUser) {
+                alert("You must be logged in!");
+                window.location.href = "/";
+            }
+        }
+
+        function logout() {
+            firebase.auth().signOut().then(() => {
+                window.location.href = "/";
+            });
+        }
+    </script>
+{% endblock %}

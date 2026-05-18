@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+    <h2>Join Chat</h2>
+    <input type="text" id="reg-acc" placeholder="Create Account Number">
+    <input type="password" id="reg-pw" placeholder="Create Password">
+    <button onclick="register()">Sign Up</button>
+    <p><a href="/">Back to Login</a></p>
+
+    <script>
+        function register() {
+            const acc = document.getElementById('reg-acc').value;
+            const pass = document.getElementById('reg-pw').value;
+            firebase.auth().createUserWithEmailAndPassword(acc + "@pwa.com", pass)
+                .then(() => {
+                    alert("Success! Now Login.");
+                    window.location.href = "/";
+                })
+                .catch(err => alert(err.message));
+        }
+    </script>
+{% endblock %}
